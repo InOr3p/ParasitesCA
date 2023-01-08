@@ -42,7 +42,7 @@ inline void swap();
 
 enum states {EMPTY = 0, PARASITE, SEEDED_GRASS, GROWING_GRASS, GROWN_GRASS};
 
-int ROWS = 300, COLS, end, *localReadMatrix, *localWriteMatrix, *matrix, GEN = 0;
+int ROWS = 300, COLS, end = 0, *localReadMatrix, *localWriteMatrix, *matrix, GEN = 0;
 
 // Nelle iterazioni con GEN % 2 == 0, faccio sviluppare solo l'erba
 // mentre nelle iterazioni con GEN % 2 != 0, faccio sviluppare solo i parassiti
