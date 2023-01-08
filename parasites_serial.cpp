@@ -266,9 +266,9 @@ void transFunc(int r, int c)
 
 inline void swap()
 {
-    int *p = read_matrix;
+    delete[] read_matrix;
     read_matrix = write_matrix;
-    write_matrix = p;
+    write_matrix = new int[ROWS*COLS]{0};
 }
 
 inline void finalize_allegro()
