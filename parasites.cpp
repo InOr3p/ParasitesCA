@@ -1,7 +1,7 @@
 
 // Compile and run:
 //  > mpicc parasites.cpp -lallegro -lallegro_primitives
-//  > mpirun -np 6 ./a.out
+//  > mpirun -np 4 ./a.out
 
 
 #include <stdlib.h>
@@ -11,7 +11,7 @@
 #include <allegro5/allegro_primitives.h>
 #include "mpi.h"
 
-//#define STEPS 200
+#define STEPS 1000
 #define SIZE_CELL 4
 #define TITLE "Parasites - Emanuele Conforti (220270)"
 
@@ -58,9 +58,14 @@ MPI_Datatype borderType;
 MPI_Datatype localMatrixType;
 MPI_Comm comm;
 int rank, nthreads, upNeighbor, downNeighbor;
+// double start_time, end_time;
 
 int main(int argc, char** argv){
+
     MPI_Init(&argc, &argv);
+    
+    // if(rank == 0)
+    //     start_time = MPI_Wtime();
 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &nthreads);
@@ -87,7 +92,6 @@ int main(int argc, char** argv){
     MPI_Cart_create(MPI_COMM_WORLD, 1, dimensions, periods, 0, &comm);
     MPI_Cart_shift(comm, 0, 1, &upNeighbor, &downNeighbor);
 
-    //Creating some new contiguous types to avoid calculating the count value for every send/receive/gather
     MPI_Type_contiguous(COLS, MPI_INT, &borderType);
     MPI_Type_contiguous((ROWS/nthreads)*COLS, MPI_INT, &localMatrixType);
     MPI_Type_commit(&borderType);
@@ -101,7 +105,7 @@ int main(int argc, char** argv){
 
     init();
 
-    while(!end){
+    while(!end && GEN < STEPS){
 
         MPI_sendBorders();       // Invio ASINCRONO dei bordi: ogni processo invia i bordi, 
 
@@ -127,6 +131,13 @@ int main(int argc, char** argv){
         MPI_Bcast(&GEN, 1, MPI_INT, 0, comm);
         MPI_Bcast(&end, 1, MPI_INT, 0, comm);
     }
+
+    if(rank == 0) {
+        // end_time = MPI_Wtime();
+        printf("ROWS: %d --- COLS: %d\n", ROWS, COLS);
+        printf("STEPS: %d\n", GEN);
+        // printf("%d thread --- Time: %lf\n", nthreads, (end_time - start_time)*1000);
+    }    
 
     finalize();
 
@@ -266,9 +277,6 @@ void transFunction(int r, int c){
                     if(!((r+i) == 0 && rank == 0) && !((r+i) == (ROWS/nthreads+1) && rank == (nthreads-1)) && (c+j) < COLS && (c+j) >= 0)
                         if(localReadMatrix[coords(r+i,c+j)] == GROWN_GRASS)
                             numGrassCells++;
-                            
-                        else if(localReadMatrix[coords(r+i,c+j)] == PARASITE)
-                            numParasiteCells++;
 
             if(numGrassCells >= 3)
                 localWriteMatrix[coords(r,c)] = SEEDED_GRASS;

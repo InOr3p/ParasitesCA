@@ -12,10 +12,10 @@ COMANDO PER COMPILARE ED ESEGUIRE IL CODICE:
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 
-#define ROWS 500
-#define COLS 500
-#define STEPS 500
-#define SIZE_CELL 3
+#define ROWS 300
+#define COLS 300
+#define STEPS 1000
+#define SIZE_CELL 4
 #define TITLE "Parasites - Emanuele Conforti (220270)"
 
 #define coords(r, c) ((r) * COLS + (c)) // per trasformare gli indici di matrice in indici di array
@@ -182,9 +182,6 @@ void transFunc(int r, int c)
                         if((r+i) < ROWS && (r+i) >= 0 && (c+j) < COLS && (c+j) >= 0)
                             if(read_matrix[coords(r+i,c+j)] == GROWN_GRASS)
                                 numGrassCells++;
-                            
-                            else if(read_matrix[coords(r+i,c+j)] == PARASITE)
-                                numParasiteCells++;
 
                 if(numGrassCells >= 3)
                     write_matrix[coords(r,c)] = SEEDED_GRASS;
