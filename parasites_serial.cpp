@@ -1,4 +1,5 @@
 /*
+---------- VERSIONE SERIALE ----------
 COMANDO PER COMPILARE ED ESEGUIRE IL CODICE:
 > g++ parasites_serial.cpp -lallegro -lallegro_primitives
 > ./a.out
