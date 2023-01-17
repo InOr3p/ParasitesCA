@@ -72,9 +72,6 @@ int main(int argc, char** argv){
 
     while(ROWS%nthreads!=0) {ROWS--;}
     COLS = ROWS;
-
-    if(rank == 0)
-        printf("ROWS: %d --- COLS: %d\n", ROWS, COLS);
     
     // Generatore di numeri casuali
     // I numeri casuali serviranno nella funzione di transizione
@@ -89,9 +86,14 @@ int main(int argc, char** argv){
     int dimensions[1] = {nthreads};
     int periods[1] = {0};
     
+    // Creazione di una topologia cartesiana 1D (ad una dimensione)
     MPI_Cart_create(MPI_COMM_WORLD, 1, dimensions, periods, 0, &comm);
     MPI_Cart_shift(comm, 0, 1, &upNeighbor, &downNeighbor);
 
+    // Inizializzazione di due datatype: borderType rappresenta una riga della matrice
+    // e serve ad inviare i bordi tra processi; localMatrixType rappresenta un'intera
+    // sotto-matrice locale ad un processo e serve ad inviare le sotto-matrici locali
+    // al processo 0 per la stampa (tramite Gather)
     MPI_Type_contiguous(COLS, MPI_INT, &borderType);
     MPI_Type_contiguous((ROWS/nthreads)*COLS, MPI_INT, &localMatrixType);
     MPI_Type_commit(&borderType);
@@ -235,7 +237,7 @@ void transFunctionInside(){
 }
 
 // Viene eseguita la funzione di transizione sulle celle aventi i bordi come vicini,
-// dopo aver ricevuti i bordi dagli altri processi 
+// dopo aver ricevuto i bordi dagli altri processi 
 void transFunctionBorders(){
 
     int start_index = 1, end_index = (ROWS/nthreads);
